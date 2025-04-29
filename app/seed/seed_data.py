@@ -675,10 +675,8 @@ def create_itineraries(db: Session, hotels, activities, transfers):
     day7.activities.append(activities[10])  # Krabi Night Market Tour
     day7.activities.append(activities[11])  # Tiger Cave Temple Tour
     
-    # Create itineraries list
     itineraries = [phuket_3n, krabi_5n, combined_7n]
     
-    # Calculate and update total prices for all itineraries
     for itinerary in itineraries:
         total_price = 0
         
@@ -720,7 +718,6 @@ def create_additional_itinerary(db: Session, nights: int, hotels, activities, tr
     db.add(itinerary)
     db.flush()
     
-    # Choose appropriate hotels based on region and duration
     if region == "Phuket":
         hotel_ids = [1, 2, 3, 4]  # Phuket hotels
     elif region == "Krabi":
@@ -728,18 +725,14 @@ def create_additional_itinerary(db: Session, nights: int, hotels, activities, tr
     else:
         hotel_ids = [1, 2, 3, 4, 6, 7, 8, 9]  # All hotels
     
-    # Create daily plans
     total_price = 0
     
     for day in range(1, nights + 1):
-        # Select a random hotel
         hotel_id = random.choice(hotel_ids)
         hotel = db.query(Hotel).filter(Hotel.id == hotel_id).first()
         
-        # Add transfer on first day and every other day with 30% chance
         transfer_id = None
         if day == 1:
-            # First day arrival transfer
             if hotel.location.region == "Phuket":
                 transfer_id = 1  # Phuket Town to Patong
             else:
@@ -761,15 +754,12 @@ def create_additional_itinerary(db: Session, nights: int, hotels, activities, tr
         db.add(plan)
         db.flush()
         
-        # Add hotel cost
         total_price += hotel.price_per_night
         
-        # Add transfer cost if any
         if transfer_id:
             transfer = db.query(Transfer).filter(Transfer.id == transfer_id).first()
             total_price += transfer.price
         
-        # Add 1-2 activities per day
         location_id = hotel.location_id
         possible_activities = db.query(Activity).filter(
             Activity.location_id == location_id

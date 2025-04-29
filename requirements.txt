@@ -1,0 +1,12 @@
+fastapi
+sqlalchemy
+uvicorn
+pydantic
+alembic
+mcp
+python-dotenv
+pytest
+httpx
+pillow
+faker
+requests  # For testing

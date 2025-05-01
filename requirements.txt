@@ -10,3 +10,4 @@ httpx
 pillow
 faker
 requests  # For testing
+streamlit  # Added for demo application

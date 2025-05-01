@@ -470,6 +470,8 @@ def seed_transfers(db: Session, locations):
 
 def create_itineraries(db: Session, hotels, activities, transfers):
     """Create itineraries with daily plans"""
+    itineraries = []
+
     # 3-night Phuket itinerary
     phuket_3n = Itinerary(
         name="Phuket Getaway",
@@ -480,41 +482,10 @@ def create_itineraries(db: Session, hotels, activities, transfers):
     )
     db.add(phuket_3n)
     db.flush()
-    
-    # Day 1: Arrival in Patong
-    day1 = DailyPlan(
-        day_number=1,
-        itinerary_id=phuket_3n.id,
-        hotel_id=1,  # Patong Resort Hotel
-        transfer_id=1,  # Phuket Town to Patong
-        notes="Arrival day with afternoon free time at Patong Beach"
-    )
-    db.add(day1)
-    db.flush()
-    day1.activities.append(activities[1])  # Patong Beach Day
-    
-    # Day 2: Patong and surroundings
-    day2 = DailyPlan(
-        day_number=2,
-        itinerary_id=phuket_3n.id,
-        hotel_id=1,  # Patong Resort Hotel
-        notes="Full day in Patong area with nightlife experience"
-    )
-    db.add(day2)
-    db.flush()
-    day2.activities.append(activities[0])  # Bangla Road Night Experience
-    
-    # Day 3: Visit Kata Beach
-    day3 = DailyPlan(
-        day_number=3,
-        itinerary_id=phuket_3n.id,
-        hotel_id=3,  # Kata Palm Resort
-        transfer_id=5,  # Patong to Kata
-        notes="Change of scenery at beautiful Kata Beach"
-    )
-    db.add(day3)
-    db.flush()
-    day3.activities.append(activities[3])  # Surf Lesson at Kata Beach
+    itineraries.append(phuket_3n)
+
+    # Create daily plans for Phuket Getaway (3 nights)
+    create_phuket_plans(db, phuket_3n.id, activities)
     
     # 5-night Krabi itinerary
     krabi_5n = Itinerary(
@@ -526,64 +497,10 @@ def create_itineraries(db: Session, hotels, activities, transfers):
     )
     db.add(krabi_5n)
     db.flush()
+    itineraries.append(krabi_5n)
     
-    # Day 1: Arrival in Ao Nang
-    day1 = DailyPlan(
-        day_number=1,
-        itinerary_id=krabi_5n.id,
-        hotel_id=6,  # Aonang Cliff Beach Resort
-        transfer_id=10,  # Krabi Town to Ao Nang
-        notes="Arrival day with evening exploration of Ao Nang"
-    )
-    db.add(day1)
-    db.flush()
-    
-    # Day 2: Kayaking Day
-    day2 = DailyPlan(
-        day_number=2,
-        itinerary_id=krabi_5n.id,
-        hotel_id=6,  # Aonang Cliff Beach Resort
-        notes="Full day of water activities in the stunning limestone landscapes"
-    )
-    db.add(day2)
-    db.flush()
-    day2.activities.append(activities[6])  # Kayaking at Ao Nang
-    
-    # Day 3: Railay Beach Day
-    day3 = DailyPlan(
-        day_number=3,
-        itinerary_id=krabi_5n.id,
-        hotel_id=7,  # Rayavadee
-        transfer_id=11,  # Ao Nang to Railay
-        notes="Luxury stay at the stunning Railay Peninsula"
-    )
-    db.add(day3)
-    db.flush()
-    day3.activities.append(activities[7])  # Rock Climbing at Railay
-    
-    # Day 4: Island Hopping
-    day4 = DailyPlan(
-        day_number=4,
-        itinerary_id=krabi_5n.id,
-        hotel_id=7,  # Rayavadee
-        notes="Exploring the stunning islands around Railay"
-    )
-    db.add(day4)
-    db.flush()
-    day4.activities.append(activities[8])  # Four Islands Tour from Railay
-    
-    # Day 5: Return to Krabi Town
-    day5 = DailyPlan(
-        day_number=5,
-        itinerary_id=krabi_5n.id,
-        hotel_id=9,  # The Brown Hotel
-        transfer_id=12,  # Railay to Ao Nang
-        notes="Final night in Krabi Town with cultural experiences"
-    )
-    db.add(day5)
-    db.flush()
-    day5.activities.append(activities[10])  # Krabi Night Market Tour
-    day5.activities.append(activities[14])  # Thai Cooking Class
+    # Create daily plans for Krabi Explorer (5 nights)
+    create_krabi_plans(db, krabi_5n.id, activities)
     
     # 7-night Phuket-Krabi combined itinerary
     combined_7n = Itinerary(
@@ -595,90 +512,17 @@ def create_itineraries(db: Session, hotels, activities, transfers):
     )
     db.add(combined_7n)
     db.flush()
+    itineraries.append(combined_7n)
     
-    # Day 1-2: Patong Beach, Phuket
-    day1 = DailyPlan(
-        day_number=1,
-        itinerary_id=combined_7n.id,
-        hotel_id=1,  # Patong Resort Hotel
-        transfer_id=1,  # Phuket Town to Patong
-        notes="Arrival day in Phuket's most popular beach area"
-    )
-    db.add(day1)
-    db.flush()
-    day1.activities.append(activities[1])  # Patong Beach Day
+    # Create daily plans for Phuket and Krabi Adventure (7 nights)
+    create_combined_plans(db, combined_7n.id, activities)
     
-    day2 = DailyPlan(
-        day_number=2,
-        itinerary_id=combined_7n.id,
-        hotel_id=1,  # Patong Resort Hotel
-        notes="Cultural day in Phuket"
-    )
-    db.add(day2)
-    db.flush()
-    day2.activities.append(activities[13])  # Big Buddha Visit
-    day2.activities.append(activities[4])  # Old Phuket Town Walking Tour
-    
-    # Day 3-4: Phi Phi Islands
-    day3 = DailyPlan(
-        day_number=3,
-        itinerary_id=combined_7n.id,
-        hotel_id=5,  # Phi Phi Island Village
-        transfer_id=6,  # Patong to Phi Phi
-        notes="Journey to the stunning Phi Phi Islands"
-    )
-    db.add(day3)
-    db.flush()
-    day3.activities.append(activities[5])  # Phi Phi Islands Boat Tour
-    
-    day4 = DailyPlan(
-        day_number=4,
-        itinerary_id=combined_7n.id,
-        hotel_id=5,  # Phi Phi Island Village
-        notes="Free day to explore Phi Phi Islands at your own pace"
-    )
-    db.add(day4)
-    db.flush()
-    
-    # Day 5-7: Krabi
-    day5 = DailyPlan(
-        day_number=5,
-        itinerary_id=combined_7n.id,
-        hotel_id=6,  # Aonang Cliff Beach Resort
-        transfer_id=8,  # Phi Phi to Ao Nang
-        notes="Transfer to Krabi's beautiful Ao Nang beach area"
-    )
-    db.add(day5)
-    db.flush()
-    day5.activities.append(activities[6])  # Kayaking at Ao Nang
-    
-    day6 = DailyPlan(
-        day_number=6,
-        itinerary_id=combined_7n.id,
-        hotel_id=7,  # Rayavadee
-        transfer_id=11,  # Ao Nang to Railay
-        notes="Experience the exclusive Railay Peninsula"
-    )
-    db.add(day6)
-    db.flush()
-    day6.activities.append(activities[7])  # Rock Climbing at Railay
-    
-    day7 = DailyPlan(
-        day_number=7,
-        itinerary_id=combined_7n.id,
-        hotel_id=9,  # The Brown Hotel
-        transfer_id=12,  # Railay to Ao Nang
-        notes="Final day exploring Krabi Town's culture and cuisine"
-    )
-    db.add(day7)
-    db.flush()
-    day7.activities.append(activities[10])  # Krabi Night Market Tour
-    day7.activities.append(activities[11])  # Tiger Cave Temple Tour
-    
-    itineraries = [phuket_3n, krabi_5n, combined_7n]
-    
+    # Calculate total prices for all itineraries
     for itinerary in itineraries:
         total_price = 0
+        
+        # Ensure we have all the daily plans loaded
+        db.refresh(itinerary)
         
         for plan in itinerary.daily_plans:
             # Add hotel cost
@@ -698,8 +542,195 @@ def create_itineraries(db: Session, hotels, activities, transfers):
         itinerary.total_price = round(total_price, 2)
     
     db.commit()
-    
     return itineraries
+
+def create_phuket_plans(db, itinerary_id, activities):
+    """Create daily plans for the 3-night Phuket itinerary"""
+    # Day 1: Arrival in Patong
+    day1 = DailyPlan(
+        day_number=1,
+        itinerary_id=itinerary_id,
+        hotel_id=1,  # Patong Resort Hotel
+        transfer_id=1,  # Phuket Town to Patong
+        notes="Arrival day with afternoon free time at Patong Beach"
+    )
+    db.add(day1)
+    db.flush()
+    day1.activities.append(activities[1])  # Patong Beach Day
+    
+    # Day 2: Patong and surroundings
+    day2 = DailyPlan(
+        day_number=2,
+        itinerary_id=itinerary_id,
+        hotel_id=1,  # Patong Resort Hotel
+        notes="Full day in Patong area with nightlife experience"
+    )
+    db.add(day2)
+    db.flush()
+    day2.activities.append(activities[0])  # Bangla Road Night Experience
+    
+    # Day 3: Visit Kata Beach
+    day3 = DailyPlan(
+        day_number=3,
+        itinerary_id=itinerary_id,
+        hotel_id=3,  # Kata Palm Resort
+        transfer_id=5,  # Patong to Kata
+        notes="Change of scenery at beautiful Kata Beach"
+    )
+    db.add(day3)
+    db.flush()
+    day3.activities.append(activities[3])  # Surf Lesson at Kata Beach
+    
+    db.commit()
+
+def create_krabi_plans(db, itinerary_id, activities):
+    """Create daily plans for the 5-night Krabi itinerary"""
+    # Day 1: Arrival in Ao Nang
+    day1 = DailyPlan(
+        day_number=1,
+        itinerary_id=itinerary_id,
+        hotel_id=6,  # Aonang Cliff Beach Resort
+        transfer_id=10,  # Krabi Town to Ao Nang
+        notes="Arrival day with evening exploration of Ao Nang"
+    )
+    db.add(day1)
+    db.flush()
+    
+    # Day 2: Kayaking Day
+    day2 = DailyPlan(
+        day_number=2,
+        itinerary_id=itinerary_id,
+        hotel_id=6,  # Aonang Cliff Beach Resort
+        notes="Full day of water activities in the stunning limestone landscapes"
+    )
+    db.add(day2)
+    db.flush()
+    day2.activities.append(activities[6])  # Kayaking at Ao Nang
+    
+    # Day 3: Railay Beach Day
+    day3 = DailyPlan(
+        day_number=3,
+        itinerary_id=itinerary_id,
+        hotel_id=7,  # Rayavadee
+        transfer_id=11,  # Ao Nang to Railay
+        notes="Luxury stay at the stunning Railay Peninsula"
+    )
+    db.add(day3)
+    db.flush()
+    day3.activities.append(activities[7])  # Rock Climbing at Railay
+    
+    # Day 4: Island Hopping
+    day4 = DailyPlan(
+        day_number=4,
+        itinerary_id=itinerary_id,
+        hotel_id=7,  # Rayavadee
+        notes="Exploring the stunning islands around Railay"
+    )
+    db.add(day4)
+    db.flush()
+    day4.activities.append(activities[8])  # Four Islands Tour from Railay
+    
+    # Day 5: Return to Krabi Town
+    day5 = DailyPlan(
+        day_number=5,
+        itinerary_id=itinerary_id,
+        hotel_id=9,  # The Brown Hotel
+        transfer_id=12,  # Railay to Ao Nang
+        notes="Final night in Krabi Town with cultural experiences"
+    )
+    db.add(day5)
+    db.flush()
+    day5.activities.append(activities[10])  # Krabi Night Market Tour
+    day5.activities.append(activities[14])  # Thai Cooking Class
+    
+    db.commit()
+
+def create_combined_plans(db, itinerary_id, activities):
+    """Create daily plans for the 7-night Phuket and Krabi itinerary"""
+    # Day 1: Arrival in Patong Beach
+    day1 = DailyPlan(
+        day_number=1,
+        itinerary_id=itinerary_id,
+        hotel_id=1,  # Patong Resort Hotel
+        transfer_id=1,  # Phuket Town to Patong
+        notes="Arrival day in Phuket's most popular beach area"
+    )
+    db.add(day1)
+    db.flush()
+    day1.activities.append(activities[1])  # Patong Beach Day
+    
+    # Day 2: Cultural day in Phuket
+    day2 = DailyPlan(
+        day_number=2,
+        itinerary_id=itinerary_id,
+        hotel_id=1,  # Patong Resort Hotel
+        notes="Cultural day in Phuket"
+    )
+    db.add(day2)
+    db.flush()
+    day2.activities.append(activities[13])  # Big Buddha Visit
+    day2.activities.append(activities[4])  # Old Phuket Town Walking Tour
+    
+    # Day 3: Journey to Phi Phi Islands
+    day3 = DailyPlan(
+        day_number=3,
+        itinerary_id=itinerary_id,
+        hotel_id=5,  # Phi Phi Island Village
+        transfer_id=6,  # Patong to Phi Phi
+        notes="Journey to the stunning Phi Phi Islands"
+    )
+    db.add(day3)
+    db.flush()
+    day3.activities.append(activities[5])  # Phi Phi Islands Boat Tour
+    
+    # Day 4: Free day in Phi Phi
+    day4 = DailyPlan(
+        day_number=4,
+        itinerary_id=itinerary_id,
+        hotel_id=5,  # Phi Phi Island Village
+        notes="Free day to explore Phi Phi Islands at your own pace"
+    )
+    db.add(day4)
+    db.flush()
+    
+    # Day 5: Transfer to Krabi
+    day5 = DailyPlan(
+        day_number=5,
+        itinerary_id=itinerary_id,
+        hotel_id=6,  # Aonang Cliff Beach Resort
+        transfer_id=8,  # Phi Phi to Ao Nang
+        notes="Transfer to Krabi's beautiful Ao Nang beach area"
+    )
+    db.add(day5)
+    db.flush()
+    day5.activities.append(activities[6])  # Kayaking at Ao Nang
+    
+    # Day 6: Railay Peninsula
+    day6 = DailyPlan(
+        day_number=6,
+        itinerary_id=itinerary_id,
+        hotel_id=7,  # Rayavadee
+        transfer_id=11,  # Ao Nang to Railay
+        notes="Experience the exclusive Railay Peninsula"
+    )
+    db.add(day6)
+    db.flush()
+    day6.activities.append(activities[7])  # Rock Climbing at Railay
+    
+    # Day 7: Krabi Town
+    day7 = DailyPlan(
+        day_number=7,
+        itinerary_id=itinerary_id,
+        hotel_id=9,  # The Brown Hotel
+        transfer_id=12,  # Railay to Ao Nang
+        notes="Final day exploring Krabi Town's culture and cuisine"
+    )
+    db.add(day7)
+    db.flush()
+    day7.activities.append(activities[10])  # Krabi Night Market Tour
+    day7.activities.append(activities[11])  # Tiger Cave Temple Tour
+    
+    db.commit()
 
 
 def create_additional_itinerary(db: Session, nights: int, hotels, activities, transfers):
